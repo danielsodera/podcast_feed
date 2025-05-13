@@ -1,11 +1,14 @@
-require 'rss'
-require 'open-uri'
-
 #Todo 
 #When finding episode 2, it pulls first item which includes the number 2 
+#Some RSS feeds don't work, some episode numbers aren't in the title
+#Episode numbers are in <itunes:episode>, but can't retrieve with feed.channel.items[0]["itunes:episode"]
 
+#EXAMPLE URLs 
 #url = 'https://anchor.fm/s/bb989624/podcast/rss'
 #url = 'https://feeds.megaphone.fm/gamescoop'
+
+require 'rss'
+require 'open-uri'
 
 feed = ''
 episode_request = 0 
@@ -53,8 +56,9 @@ begin
       URI.open(url) { |rss| feed = RSS::Parser.parse(rss) }
 rescue
       puts "Invalid RSS-URL, please run program again"
+      exit(1)
 end 
-
+     #puts feed #Testing purposes 
      podcast_episode(feed, episode_number)
 
     #Asks user to search for a specific episode number, wrapped in while loop to catch invalid entries 
