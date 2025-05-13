@@ -1,18 +1,75 @@
 require 'rss'
 require 'open-uri'
 
-url = 'https://anchor.fm/s/bb989624/podcast/rss'
+#Todo 
+#When finding episode 2, it pulls first item which includes the number 2 
+#If the episode doesn't exit, try again 
 
-URI.open(url) do |rss|
-  feed = RSS::Parser.parse(rss)
- # puts "Title: #{feed.channel.title}"
+#url = 'https://anchor.fm/s/bb989624/podcast/rss'
+#url = 'https://feeds.megaphone.fm/gamescoop'
 
- # puts "Episode: #{feed.items[0].title}"
-  puts feed.channel.items[0].title 
-  puts feed.channel.items[0].pubDate 
-  puts feed.channel.items[0].link 
-  
+feed = ''
+episode_request = 0 
+episode_number = 0 
+
+def podcast_title(feed, episode_number = 0)
+  puts "The latest episode of #{feed.channel.title} is: #{feed.channel.items[episode_number].title}" 
 end
 
+#Only displays first 16 characters of publish date 
+def podcast_publish_date(feed, episode_number = 0)
+  puts "This episode published on: #{feed.channel.items[episode_number].pubDate.to_s[0..15]}" 
+end
 
+#Protection for if a link isn't in RSS feed
+def podcast_link(feed, episode_number = 0)
+  if feed.channel.items[episode_number].link == nil 
+    puts "No link was provided from feed" 
+  else 
+    puts "Link to episode: #{feed.channel.items[episode_number].link}"
+  end
+end
+
+def podcast_episode(feed, episode_number = 0)
+  podcast_title(feed, episode_number)
+  podcast_publish_date(feed, episode_number)
+  podcast_link(feed, episode_number)  
+end
+
+#When user types in episode number, search through array to find the episode index 
+def episode_index(feed, episode_number)
+  feed.channel.items.each_with_index do |item, index|
+    if item.title.include? episode_number.to_s 
+       return index 
+    end
+  end
+end
+
+#Asks user to provide RSS feed 
+puts "Please type URL for podcast RSS feed"
+url = gets.chomp!
+
+#If URL is invalid, output error message
+begin
+      URI.open(url) { |rss| feed = RSS::Parser.parse(rss) }
+rescue
+      puts "Invalid RSS-URL, please run program again"
+end 
+
+     podcast_episode(feed, episode_number)
+
+    #Asks user to search for a specific episode number, wrapped in while loop to catch invalid entries 
+    while episode_request < 1 
+          puts "Type in an episode you want to find. #{feed.channel.title} currently has #{feed.channel.items.size - 1} episodes"
+          episode_request = gets.chomp!.to_i
+      
+      if episode_request < 1 
+          puts "Invalid number, please enter an integer starting from 1. Try again"
+      else 
+          puts "Thanks, searching for epsiode number: #{episode_request}"
+      end
+    end
+
+    episode_number = episode_index(feed, episode_request)
+    podcast_episode(feed, episode_number)
 
