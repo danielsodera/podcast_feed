@@ -3,7 +3,6 @@ require 'open-uri'
 
 #Todo 
 #When finding episode 2, it pulls first item which includes the number 2 
-#If the episode doesn't exit, try again 
 
 #url = 'https://anchor.fm/s/bb989624/podcast/rss'
 #url = 'https://feeds.megaphone.fm/gamescoop'
@@ -59,12 +58,13 @@ end
      podcast_episode(feed, episode_number)
 
     #Asks user to search for a specific episode number, wrapped in while loop to catch invalid entries 
-    while episode_request < 1 
+    #Probably a cleaner way to do this, involves a lot of repeating code
+    while episode_request < 1 || episode_request > (feed.channel.items.size - 1)
           puts "Type in an episode you want to find. #{feed.channel.title} currently has #{feed.channel.items.size - 1} episodes"
           episode_request = gets.chomp!.to_i
       
-      if episode_request < 1 
-          puts "Invalid number, please enter an integer starting from 1. Try again"
+      if episode_request < 1 || episode_request > (feed.channel.items.size - 1)
+          puts "Invalid number, please enter an integer starting from 1 to #{feed.channel.items.size - 1}. Try again"
       else 
           puts "Thanks, searching for epsiode number: #{episode_request}"
       end
